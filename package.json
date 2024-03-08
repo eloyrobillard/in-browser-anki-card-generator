@@ -1,0 +1,32 @@
+{
+  "name": "anki-card-generator",
+  "version": "1.0.0",
+  "description": "Create Anki cards from browser content.",
+  "type": "module",
+  "main": "popup.js",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eloyrobillard/in-browser-anki-card-generator.git"
+  },
+  "webExt": {
+    "sourceDir": "./"
+  },
+  "keywords": [
+    "anki"
+  ],
+  "author": "Eloy Robillard",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/eloyrobillard/in-browser-anki-card-generator/issues"
+  },
+  "homepage": "https://github.com/eloyrobillard/in-browser-anki-card-generator#readme",
+  "dependencies": {
+    "typescript": "^5.4.2"
+  }
+}

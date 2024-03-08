@@ -7,3 +7,4 @@ if (ankiConnected) {
 
 	ankiStatusDiv.textContent = 'Connected';
 }
+

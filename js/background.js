@@ -5,3 +5,4 @@ export async function checkAnkiConnectStatus() {
 	console.log(res);
 	return true;
 }
+
