@@ -10,7 +10,10 @@
         "strictPropertyInitialization": true,
         "suppressImplicitAnyIndexErrors": false,
         "skipLibCheck": false,
-        "baseUrl": "."
+        "baseUrl": ".",
+        "types": [
+            "chrome",
+            "firefox-webext-browser"
+        ]
     }
 }
-

@@ -1,10 +1,21 @@
-import { checkAnkiConnectStatus } from './backend';
+import { checkAnkiConnectStatus } from './api.js';
 
-const ankiConnected = checkAnkiConnectStatus();
+/**
+ * @param {boolean} ankiConnected
+ */
+function updateAnkiConnectionStatus(ankiConnected) {
+	if (ankiConnected) {
+		const ankiStatusDiv = document.getElementById('anki-connect-status');
 
-if (ankiConnected) {
-	const ankiStatusDiv = document.getElementById('anki-connect-status');
-
-	ankiStatusDiv.textContent = 'Connected';
+		if (ankiStatusDiv) {
+			ankiStatusDiv.textContent = 'Connected';
+		}
+	}
 }
+
+await checkAnkiConnectStatus(res => {
+	if (res && typeof res === 'object') {
+		updateAnkiConnectionStatus(!!res.result)
+	}
+});
 
