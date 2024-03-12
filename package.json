@@ -28,5 +28,8 @@
   "homepage": "https://github.com/eloyrobillard/in-browser-anki-card-generator#readme",
   "dependencies": {
     "typescript": "^5.4.2"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.263"
   }
 }
