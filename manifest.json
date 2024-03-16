@@ -16,8 +16,19 @@
 			]
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"button.html",
+				"js/*"
+			],
+			"matches": [
+				"<all_urls>"
+			]
+		}
+	],
 	"background": {
-		"service_worker": "/js/background.js",
+		"service_worker": "js/background.js",
 		"type": "module"
 	}
 }
