@@ -20,7 +20,8 @@
 		{
 			"resources": [
 				"button.html",
-				"js/*"
+				"js/*",
+				"assets/*"
 			],
 			"matches": [
 				"<all_urls>"

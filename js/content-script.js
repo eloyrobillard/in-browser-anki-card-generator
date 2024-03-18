@@ -1,4 +1,11 @@
 /**
+ * @param {Document} a
+ */
+function getScrollingElement(a) {
+	return a.scrollingElement ? a.scrollingElement : a.compatMode === "CSS1Compat" ? a.documentElement : a.body || a.documentElement;
+}
+
+/**
  * @param {(...args: any) => void} f
  */
 function debounce(f, delay = 500) {
@@ -6,7 +13,7 @@ function debounce(f, delay = 500) {
 	let timeout;
 	return (/** @type {any[]} */ ...args) => {
 		clearTimeout(timeout);
-		timeout = setTimeout(() => f(args), delay);
+		timeout = setTimeout(() => f(...args), delay);
 	}
 }
 
@@ -14,37 +21,38 @@ function debounce(f, delay = 500) {
  * @param {number} top
  * @param {number} left
  */
-function createIframe(top, left) {
-	const iframe = document.createElement('iframe');
+function createButton(top, left) {
+	const button = document.createElement('div');
 
-	iframe.id = 'anki-generator-frame';
-	iframe.style.top = `${String(top)}px`;
-	iframe.style.left = `${String(left)}px`;
-	iframe.style.position = 'absolute';
-	iframe.style.width = '50px';
-	iframe.style.height = '50px';
+	button.id = 'anki-generator-frame';
+	button.style.top = `${String(top)}px`;
+	button.style.left = `${String(left)}px`;
+	button.style.position = 'absolute';
+	button.style.width = '19px';
+	button.style.height = '19px';
+	button.style.backgroundSize = '19px';
+	button.style.backgroundImage = `url(${chrome.runtime.getURL('/assets/anki.ico')})`;
 
-	const url = chrome.runtime.getURL('/button.html');
-	iframe.setAttribute('src', url);
-
-	return iframe;
+	return button;
 }
 
-document.addEventListener('selectionchange', debounce(() => {
-	const selection = document.getSelection();
+document.addEventListener('mouseup', debounce((e) => {
+	const selection = window.getSelection();
+	const button = document.getElementById('anki-generator-frame');
 
-	const iframe = document.getElementById('anki-generator-frame');
+	if (selection?.toString() && !button) {
+		const scroll = getScrollingElement(document);
+		const top = e.clientY + scroll.scrollTop;
+		const left = e.clientX + scroll.scrollLeft - 13;
 
-	if (selection && selection.toString() && !iframe) {
-		const rect = selection.getRangeAt(0).getBoundingClientRect();
-		const newIframe = createIframe(rect.top, rect.left);
+		const newbutton = createButton(top, left);
 
-		document.body.appendChild(newIframe);
+		document.body.appendChild(newbutton);
 	}
 }));
 
 document.addEventListener('mousedown', () => {
-	const iframe = document.getElementById('anki-generator-frame');
+	const button = document.getElementById('anki-generator-frame');
 
-	if (iframe) document.body.removeChild(iframe);
+	if (button) document.body.removeChild(button);
 });
