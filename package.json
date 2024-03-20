@@ -30,6 +30,7 @@
     "typescript": "^5.4.2"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.263"
+    "@types/chrome": "^0.0.263",
+    "eslint": "^8.57.0"
   }
 }

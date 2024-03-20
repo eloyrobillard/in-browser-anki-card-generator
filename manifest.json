@@ -31,5 +31,11 @@
 	"background": {
 		"service_worker": "js/background.js",
 		"type": "module"
-	}
+	},
+	"options_ui": {
+		"page": "options.html"
+	},
+	"permissions": [
+		"storage"
+	]
 }
