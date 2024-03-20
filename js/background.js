@@ -50,7 +50,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
                 .then(sendResponse)
                 .catch(error => sendResponse({ error }));
             break;
-
     }
+
     return true;
 });
