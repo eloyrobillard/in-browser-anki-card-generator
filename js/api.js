@@ -1,21 +1,7 @@
-/**
- * @param {(response: unknown) => void} cb
- */
-export async function checkAnkiConnectStatus(cb) {
-    try {
-        chrome.runtime.sendMessage({ message: 'connect' }, cb);
-    } catch (error) {
-        console.error(error);
-    }
+export async function checkAnkiConnectStatus() {
+    return new Promise((resolve) => chrome.runtime.sendMessage({ message: 'connect' }, resolve));
 }
 
-/**
- * @param {(response: any) => void} cb
- */
-export async function getCardModels(cb) {
-    try {
-        chrome.runtime.sendMessage({ message: 'models' }, cb);
-    } catch (error) {
-        console.error(error);
-    }
+export async function getCardModels() {
+    return new Promise((resolve) => chrome.runtime.sendMessage({ message: 'models' }, resolve));
 }

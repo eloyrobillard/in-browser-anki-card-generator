@@ -1,5 +1,11 @@
 import { checkAnkiConnectStatus, getCardModels } from './api.js';
 
+async function refreshCardModels() {
+    const data = await getCardModels();
+    await chrome.storage.sync.set({ cardModels: data });
+    return data;
+}
+
 /**
  * @param {boolean} ankiConnected
  */
@@ -37,30 +43,37 @@ function generateCardModelOptions(data, selected) {
 function setCardModel(e) {
     e.preventDefault();
 
-    chrome.storage.sync.set({ selectedModel: e.currentTarget.value }).then(() => console.log('Set selected model', e.currentTarget.value));
+    chrome.storage.sync.set({ selectedModel: e.target.value }).then(() => console.log('Set selected model', e.target.value));
 }
 
-const cardModels = chrome.storage.sync.get('cardModels');
-await cardModels.then(async _ms => {
-    const cardModelSelect = document.getElementById('model-select');
-    cardModelSelect?.addEventListener('change', setCardModel);
+// TODO: remove need for destructuring
+let { cardModels } = await chrome.storage.sync.get('cardModels');
+const cardModelSelect = document.getElementById('model-select');
 
-    await getCardModels(async data => {
-        chrome.storage.sync.set({ cardModels: data });
+if (!cardModels) {
+    cardModels = await refreshCardModels();
+}
 
-        const selected = await chrome.storage.sync.get('selectedModel');
-        console.log(selected);
-        const options = generateCardModelOptions(data, selected);
+// TODO: remove need for destructuring
+const { selectedModel } = await chrome.storage.sync.get('selectedModel');
+console.log('Selected model', selectedModel);
 
-        for (const option of options) {
-            cardModelSelect?.appendChild(option);
-        }
-    });
-});
+// TODO: implement
+if (!selectedModel) { }
 
-await checkAnkiConnectStatus(res => {
+const options = generateCardModelOptions(cardModels, selectedModel);
+
+for (const option of options) {
+    cardModelSelect?.appendChild(option);
+}
+
+await checkAnkiConnectStatus().then(res => {
     if (res && typeof res === 'object' && 'result' in res) {
         updateAnkiConnectionStatus(!!res.result);
     }
 });
+
+// DOM Event Listeners
+
+cardModelSelect?.addEventListener('change', setCardModel);
 
