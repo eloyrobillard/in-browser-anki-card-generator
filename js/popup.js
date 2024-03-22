@@ -1,9 +1,16 @@
-import { checkAnkiConnectStatus, getCardModels } from './api.js';
+import { checkAnkiConnectStatus, getCardModels, getDecks } from './api.js';
+
+async function refreshDecks() {
+    const decks = await getDecks();
+    console.log(decks);
+    await chrome.storage.sync.set({ decks });
+    return decks;
+}
 
 async function refreshCardModels() {
-    const data = await getCardModels();
-    await chrome.storage.sync.set({ cardModels: data });
-    return data;
+    const cardModels = await getCardModels();
+    await chrome.storage.sync.set({ cardModels });
+    return cardModels;
 }
 
 /**
@@ -17,63 +24,105 @@ function updateAnkiConnectionStatus(ankiConnected) {
             ankiStatusDiv.textContent = 'Connected';
         }
     }
+
+    return ankiConnected;
 }
 
-function generateCardModelOptions(data, selected) {
-    const { result } = data;
+function generateDeckOptions(decks, selected) {
     const options = [];
 
-    if (result) {
-        for (const model of Object.keys(result)) {
-            const option = document.createElement('option');
-            option.setAttribute('value', model);
-            option.textContent = model;
+    for (const deck of decks) {
+        const option = document.createElement('option');
+        option.setAttribute('value', deck);
+        option.textContent = deck;
 
-            if (selected === model) {
-                option.setAttribute('selected', '');
-            }
-
-            options.push(option);
+        if (selected === deck) {
+            option.setAttribute('selected', '');
         }
+
+        options.push(option);
     }
 
     return options;
 }
 
-function setCardModel(e) {
+function generateCardModelOptions(cardModels, selected) {
+    const options = [];
+
+    for (const model of Object.keys(cardModels)) {
+        const option = document.createElement('option');
+        option.setAttribute('value', model);
+        option.textContent = model;
+
+        if (selected === model) {
+            option.setAttribute('selected', '');
+        }
+
+        options.push(option);
+    }
+
+    return options;
+}
+
+async function handleDeckSelect(e) {
     e.preventDefault();
 
-    chrome.storage.sync.set({ selectedModel: e.target.value }).then(() => console.log('Set selected model', e.target.value));
+    const deck = e.target.value;
+
+    if (!deck) return;
+
+    await chrome.storage.sync.set({ selectedDeck: e.target.value }).then(() => console.log('Selected deck:', e.target.value));
 }
 
-// TODO: remove need for destructuring
-let { cardModels } = await chrome.storage.sync.get('cardModels');
-const cardModelSelect = document.getElementById('model-select');
+async function handleCardModelSelect(e) {
+    e.preventDefault();
 
-if (!cardModels) {
-    cardModels = await refreshCardModels();
+    const model = e.target.value;
+
+    if (!model) return;
+
+    await chrome.storage.sync.set({ selectedModel: e.target.value }).then(() => console.log('Selected model:', e.target.value));
 }
 
-// TODO: remove need for destructuring
-const { selectedModel } = await chrome.storage.sync.get('selectedModel');
-console.log('Selected model', selectedModel);
-
-// TODO: implement
-if (!selectedModel) { }
-
-const options = generateCardModelOptions(cardModels, selectedModel);
-
-for (const option of options) {
-    cardModelSelect?.appendChild(option);
-}
-
-await checkAnkiConnectStatus().then(res => {
-    if (res && typeof res === 'object' && 'result' in res) {
-        updateAnkiConnectionStatus(!!res.result);
+async function getModels() {
+    let { cardModels } = await chrome.storage.sync.get('cardModels');
+    if (!cardModels) {
+        cardModels = await refreshCardModels();
     }
-});
 
-// DOM Event Listeners
+    const { selectedModel } = await chrome.storage.sync.get('selectedModel');
 
-cardModelSelect?.addEventListener('change', setCardModel);
+    let { decks } = await chrome.storage.sync.get('decks');
+    if (!decks) {
+        decks = await refreshDecks();
+    }
+
+    const { selectedDeck } = await chrome.storage.sync.get('selectedDeck');
+
+    return { cardModels, selectedModel, decks, selectedDeck };
+}
+
+const ankiConnected = await checkAnkiConnectStatus().then(updateAnkiConnectionStatus);
+
+if (ankiConnected) {
+    const { cardModels, selectedModel, decks, selectedDeck } = await getModels();
+
+    const modelNodes = generateCardModelOptions(cardModels, selectedModel);
+
+    const cardModelSelect = document.getElementById('model-select');
+    for (const node of modelNodes) {
+        cardModelSelect?.appendChild(node);
+    }
+
+    const deckNodes = generateDeckOptions(decks, selectedDeck);
+
+    const deckSelect = document.getElementById('deck-select');
+    for (const node of deckNodes) {
+        deckSelect?.appendChild(node);
+    }
+
+    // DOM Event Listeners
+
+    cardModelSelect?.addEventListener('change', handleCardModelSelect);
+}
 

@@ -36,21 +36,35 @@ async function getCardModels() {
     return post(body);
 }
 
+async function getDecks() {
+    const body = {
+        action: 'deckNames',
+        version: 6
+    };
+
+    return post(body);
+}
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     console.log('Received message:', msg);
 
     switch (msg.message) {
         case 'connect':
             checkAnkiConnectStatus()
-                .then(sendResponse)
-                .catch(error => sendResponse({ error }));
+                .then(() => sendResponse(true))
+                .catch(() => sendResponse(false));
             break;
         case 'models':
             getCardModels()
-                .then(sendResponse)
+                .then(({ result }) => sendResponse(result))
                 .catch(error => sendResponse({ error }));
             break;
+        case 'decks':
+            getDecks()
+                .then(({ result }) => sendResponse(result))
+                .catch(error => sendResponse({ error }));
     }
 
     return true;
 });
+
