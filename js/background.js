@@ -45,6 +45,38 @@ async function getDecks() {
     return post(body);
 }
 
+async function guiAddCard() {
+    const { selectedDeck: deckName } = await chrome.storage.sync.get('selectedDeck');
+    const { selectedModel: modelName } = await chrome.storage.sync.get('selectedModel');
+    const { selectedField: fieldName } = await chrome.storage.sync.get('selectedField');
+    const { selection: fieldContent } = await chrome.storage.sync.get('selection');
+
+    const body = {
+        action: 'guiAddCards',
+        version: 6,
+        params: {
+            note: {
+                deckName,
+                modelName,
+                fields: { [fieldName]: fieldContent }
+            }
+        }
+    };
+
+    return post(body);
+}
+
+async function getFields() {
+    const { selectedModel: modelName } = await chrome.storage.sync.get('selectedModel');
+    const body = {
+        action: 'modelFieldNames',
+        version: 6,
+        params: { modelName }
+    };
+
+    return post(body);
+}
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     console.log('Received message:', msg);
 
@@ -56,13 +88,36 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
             break;
         case 'models':
             getCardModels()
-                .then(({ result }) => sendResponse(result))
-                .catch(error => sendResponse({ error }));
+                .then(({ result, error }) => {
+                    if (error) sendResponse(error);
+                    else sendResponse(result);
+                })
+                .catch(error => sendResponse(error));
             break;
         case 'decks':
             getDecks()
-                .then(({ result }) => sendResponse(result))
-                .catch(error => sendResponse({ error }));
+                .then(({ result, error }) => {
+                    if (error) sendResponse(error);
+                    else sendResponse(result);
+                })
+                .catch(error => sendResponse(error));
+            break;
+        case 'fields':
+            getFields()
+                .then(({ result, error }) => {
+                    if (error) sendResponse(error);
+                    else sendResponse(result);
+                })
+                .catch(error => sendResponse(error));
+            break;
+        case 'addCard':
+            guiAddCard()
+                .then(({ result, error }) => {
+                    if (error) sendResponse(error);
+                    else sendResponse(result);
+                })
+                .catch(error => sendResponse(error));
+            break;
     }
 
     return true;

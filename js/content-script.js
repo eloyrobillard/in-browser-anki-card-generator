@@ -33,21 +33,32 @@ function createButton(top, left) {
     button.style.backgroundSize = '19px';
     button.style.backgroundImage = `url(${chrome.runtime.getURL('/assets/anki.ico')})`;
 
+    button.addEventListener('mousedown', async () => {
+        await chrome.runtime.sendMessage({ message: 'addCard' });
+        chrome.storage.sync.remove('selection');
+    });
+
     return button;
 }
 
+function placeButton(e) {
+    const scroll = getScrollingElement(document);
+    const top = e.clientY + scroll.scrollTop;
+    const left = e.clientX + scroll.scrollLeft - 13;
+
+    const newbutton = createButton(top, left);
+
+    document.body.appendChild(newbutton);
+}
+
 document.addEventListener('mouseup', debounce((e) => {
-    const selection = window.getSelection();
+    const selection = window.getSelection()?.toString();
     const button = document.getElementById('anki-generator-frame');
 
-    if (selection?.toString() && !button) {
-        const scroll = getScrollingElement(document);
-        const top = e.clientY + scroll.scrollTop;
-        const left = e.clientX + scroll.scrollLeft - 13;
+    if (selection && !button) {
+        chrome.storage.sync.set({ selection });
 
-        const newbutton = createButton(top, left);
-
-        document.body.appendChild(newbutton);
+        placeButton(e);
     }
 }));
 

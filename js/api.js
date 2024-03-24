@@ -1,11 +1,19 @@
 export async function checkAnkiConnectStatus() {
-    return new Promise(resolve => chrome.runtime.sendMessage({ message: 'connect' }, resolve));
+    return chrome.runtime.sendMessage({ message: 'connect' });
 }
 
 export async function getCardModels() {
-    return new Promise(resolve => chrome.runtime.sendMessage({ message: 'models' }, resolve));
+    return chrome.runtime.sendMessage({ message: 'models' });
 }
 
 export async function getDecks() {
-    return new Promise(resolve => chrome.runtime.sendMessage({ message: 'decks' }, resolve));
+    return chrome.runtime.sendMessage({ message: 'decks' });
+}
+
+export async function getFields() {
+    return chrome.runtime.sendMessage({ message: 'fields' });
+}
+
+export async function guiAddCards(fieldContent) {
+    return chrome.runtime.sendMessage({ message: 'guiAddCards', fieldContent });
 }
