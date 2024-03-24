@@ -13,6 +13,9 @@ async function refreshCardModels() {
     return cardModels;
 }
 
+/**
+ * @return {Promise<string[]>) fields
+ */
 async function refreshFields() {
     const fields = await getFields();
     await chrome.storage.sync.set({ fields });
@@ -105,6 +108,7 @@ async function handleModelSelect(e) {
     }
 
     const fields = await refreshFields();
+    await chrome.storage.sync.set({ selectedField: fields[0] });
     fieldSelect = createFieldSelect(fields, fields[0]);
 
     document.getElementById('model-select')?.after(fieldSelect);
@@ -147,6 +151,7 @@ function createFieldSelect(fields, selectedField) {
         fieldSelect.appendChild(option);
     }
 
+    fieldSelect.addEventListener('change', handleFieldSelect);
     return fieldSelect;
 }
 
@@ -165,19 +170,15 @@ if (ankiConnected) {
         }
 
         if (selectedModel) {
-            let { fields } = await chrome.storage.sync.get('fields');
-            if (!fields) {
-                fields = await refreshFields();
-            }
+            const fields = await refreshFields();
 
             let { selectedField } = await chrome.storage.sync.get('selectedField');
-            if (!selectedField) {
+            if (!selectedField || !fields.includes(selectedField)) {
                 selectedField = fields[0];
                 await chrome.storage.sync.set({ selectedField });
             }
 
             const fieldSelect = createFieldSelect(fields, selectedField);
-            fieldSelect.addEventListener('change', handleFieldSelect);
             modelSelect.after(fieldSelect);
         }
     }
