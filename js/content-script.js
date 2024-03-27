@@ -31,11 +31,11 @@ function createButton(top, left) {
     button.style.width = '19px';
     button.style.height = '19px';
     button.style.backgroundSize = '19px';
-    button.style.backgroundImage = `url(${chrome.runtime.getURL('/assets/anki.ico')})`;
+    button.style.backgroundImage = `url(${browser.runtime.getURL('/assets/anki.ico')})`;
 
     button.addEventListener('mousedown', async () => {
-        await chrome.runtime.sendMessage({ message: 'addCard' });
-        chrome.storage.sync.remove('selection');
+        await browser.runtime.sendMessage({ message: 'addCard' });
+        browser.storage.sync.remove('selection');
     });
 
     return button;
@@ -56,7 +56,7 @@ document.addEventListener('mouseup', debounce((e) => {
     const button = document.getElementById('anki-generator-frame');
 
     if (selection && !button) {
-        chrome.storage.sync.set({ selection });
+        browser.storage.sync.set({ selection });
 
         placeButton(e);
     }

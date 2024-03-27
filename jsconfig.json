@@ -11,9 +11,9 @@
         "suppressImplicitAnyIndexErrors": false,
         "skipLibCheck": false,
         "baseUrl": ".",
-        "types": [
-            "chrome",
-            "firefox-webext-browser"
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules/web-ext-types"
         ]
     }
 }

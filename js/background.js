@@ -1,9 +1,9 @@
-const ankiConnectPort = 8765;
-
 /**
  * @param {{ action: string; version: number; }} body
  */
 async function post(body) {
+    const ankiConnectPort = 8765;
+
     return fetch(`http://127.0.0.1:${ankiConnectPort}`, {
         method: 'POST',
         mode: 'cors',

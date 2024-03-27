@@ -3,13 +3,13 @@ import { checkAnkiConnectStatus, getCardModels, getDecks, getFields } from './ap
 async function refreshDecks() {
     const decks = await getDecks();
     // deckNames object too large to store in storage.sync
-    // await chrome.storage.sync.set({ decks });
+    // await browser.storage.sync.set({ decks });
     return decks;
 }
 
 async function refreshCardModels() {
     const cardModels = await getCardModels();
-    await chrome.storage.sync.set({ cardModels });
+    await browser.storage.sync.set({ cardModels });
     return cardModels;
 }
 
@@ -18,7 +18,7 @@ async function refreshCardModels() {
  */
 async function refreshFields() {
     const fields = await getFields();
-    await chrome.storage.sync.set({ fields });
+    await browser.storage.sync.set({ fields });
     return fields;
 }
 
@@ -44,6 +44,11 @@ function updateAnkiConnectionStatus(ankiConnected) {
 function generateDeckOptions(decks, selected) {
     const options = [];
 
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = '=== Please select a deck ===';
+    options.push(emptyOption);
+
     for (const deck of decks) {
         const option = document.createElement('option');
         option.setAttribute('value', deck);
@@ -65,6 +70,11 @@ function generateDeckOptions(decks, selected) {
  */
 function generateCardModelOptions(cardModels, selected) {
     const options = [];
+
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = '=== Please select a card model ===';
+    options.push(emptyOption);
 
     for (const model of Object.keys(cardModels)) {
         const option = document.createElement('option');
@@ -88,7 +98,7 @@ async function handleDeckSelect(e) {
 
     if (!deck) return;
 
-    await chrome.storage.sync.set({ selectedDeck: e.target.value });
+    await browser.storage.sync.set({ selectedDeck: e.target.value });
     console.log('Selected deck:', e.target.value);
 }
 
@@ -99,7 +109,7 @@ async function handleModelSelect(e) {
 
     if (!model) return;
 
-    await chrome.storage.sync.set({ selectedModel: e.target.value });
+    await browser.storage.sync.set({ selectedModel: e.target.value });
     console.log('Selected model:', e.target.value);
 
     let fieldSelect = document.getElementById('field-select');
@@ -108,22 +118,22 @@ async function handleModelSelect(e) {
     }
 
     const fields = await refreshFields();
-    await chrome.storage.sync.set({ selectedField: fields[0] });
+    await browser.storage.sync.set({ selectedField: fields[0] });
     fieldSelect = createFieldSelect(fields, fields[0]);
 
     document.getElementById('model-select')?.after(fieldSelect);
 }
 
 async function getModels() {
-    let { cardModels } = await chrome.storage.sync.get('cardModels');
+    let { cardModels } = await browser.storage.sync.get('cardModels');
     if (!cardModels) {
         cardModels = await refreshCardModels();
     }
 
-    const { selectedModel } = await chrome.storage.sync.get('selectedModel');
+    const { selectedModel } = await browser.storage.sync.get('selectedModel');
 
     const decks = await refreshDecks();
-    const { selectedDeck } = await chrome.storage.sync.get('selectedDeck');
+    const { selectedDeck } = await browser.storage.sync.get('selectedDeck');
 
     return { cardModels, selectedModel, decks, selectedDeck };
 }
@@ -131,7 +141,7 @@ async function getModels() {
 function handleFieldSelect(e) {
     e.preventDefault();
 
-    chrome.storage.sync.set({ selectedField: e.target.value });
+    browser.storage.sync.set({ selectedField: e.target.value });
 }
 
 /**
@@ -172,10 +182,10 @@ if (ankiConnected) {
         if (selectedModel) {
             const fields = await refreshFields();
 
-            let { selectedField } = await chrome.storage.sync.get('selectedField');
+            let { selectedField } = await browser.storage.sync.get('selectedField');
             if (!selectedField || !fields.includes(selectedField)) {
                 selectedField = fields[0];
-                await chrome.storage.sync.set({ selectedField });
+                await browser.storage.sync.set({ selectedField });
             }
 
             const fieldSelect = createFieldSelect(fields, selectedField);

@@ -3,6 +3,11 @@
 	"description": "Generate Anki cards directly from content in the browser.",
 	"version": "1.0",
 	"manifest_version": 3,
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "ankicardgenerator@example.com"
+		}
+	},
 	"action": {
 		"default_popup": "popup.html"
 	},
@@ -12,6 +17,7 @@
 				"<all_urls>"
 			],
 			"js": [
+				"browser-polyfill.js",
 				"js/content-script.js"
 			]
 		}
@@ -29,7 +35,7 @@
 		}
 	],
 	"background": {
-		"service_worker": "js/background.js",
+		"scripts": ["browser-polyfill.js", "js/background.js"],
 		"type": "module"
 	},
 	"permissions": [
