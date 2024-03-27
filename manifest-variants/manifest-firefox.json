@@ -1,0 +1,44 @@
+{
+	"name": "Anki Card Generator",
+	"description": "Generate Anki cards directly from content in the browser.",
+	"version": "1.0",
+	"manifest_version": 3,
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "ankicardgenerator@example.com"
+		}
+	},
+	"action": {
+		"default_popup": "popup.html"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"browser-polyfill.js",
+				"js/content-script.js"
+			]
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"button.html",
+				"js/*",
+				"assets/*"
+			],
+			"matches": [
+				"<all_urls>"
+			]
+		}
+	],
+	"background": {
+		"scripts": ["browser-polyfill.js", "js/background.js"],
+		"type": "module"
+	},
+	"permissions": [
+		"storage"
+	]
+}

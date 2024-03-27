@@ -1,3 +1,9 @@
+# Builds folder
+*.zip
+*.pem
+*.crx
+build/*/*
+
 # Logs
 logs
 *.log
